@@ -102,7 +102,6 @@ $RECYCLE.BIN/
 
 .gradle
 build/
-gradle/
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -123,3 +122,7 @@ bots/
 config/
 data/
 plugins/
+
+# Allow Gradle Jar
+!gradle-wrapper.jar
+!gradle-wrapper.properties
