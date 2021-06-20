@@ -1,0 +1,35 @@
+package org.vworks.mirai.nightbot
+
+import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
+import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
+import net.mamoe.mirai.event.GlobalEventChannel
+import net.mamoe.mirai.event.globalEventChannel
+import net.mamoe.mirai.utils.info
+import org.vworks.mirai.nightbot.config.Config
+import org.vworks.mirai.nightbot.data.RegimenData
+import org.vworks.mirai.nightbot.listener.MessageListener
+
+object Nightbot : KotlinPlugin(
+    JvmPluginDescription(
+        id = "org.vworks.mirai.nightbot",
+        name = "Nightbot - Mirai",
+        version = "1.0-SNAPSHOT",
+    ) {
+        author("MetricVoid")
+        info("""Nightbot的Mirai原生版本""")
+    }
+) {
+    override fun onEnable() {
+        logger.info { "Loading config file." }
+        Config.reload()
+
+        logger.info { "Loading data." }
+        RegimenData.reload()
+
+        logger.info { "Starting event listener." }
+        val msgListener = MessageListener(this)
+        GlobalEventChannel.registerListenerHost(msgListener)
+
+        logger.info { "Initialization complete." }
+    }
+}
