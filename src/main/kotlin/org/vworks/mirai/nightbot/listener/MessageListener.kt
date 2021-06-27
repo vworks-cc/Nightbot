@@ -31,8 +31,6 @@ class MessageListener(val pluginBase : KotlinPlugin) : ListenerHost {
     @ExperimentalTime
     @EventHandler
     suspend fun MessageEvent.onMessage() {
-        pluginBase.logger.info ( "Message Received: ${this.message.content.toString()}" )
-
         if(Config.doNotUseAllBots && bot.id !in Config.useBotList) { return }
         if(Config.useWhiteList && sender.id !in Config.whiteList) { return }
         if(Config.useBlackList && sender.id in Config.blackList) { return }
