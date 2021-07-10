@@ -48,3 +48,6 @@ deploy:
         paths:
         - build
         - .gradle
+    artifacts:
+      paths:
+        - build/mirai/*.jar
