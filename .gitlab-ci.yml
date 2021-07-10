@@ -21,7 +21,7 @@ before_script:
 
 build:
   stage: build
-  script: ./gradlew --build-cache assemble
+  script: chmod +x ./gradlew && ./gradlew --build-cache assemble
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
@@ -31,7 +31,7 @@ build:
 
 test:
   stage: test
-  script: ./gradlew check
+  script: chmod +x ./gradlew && ./gradlew check
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
@@ -41,7 +41,7 @@ test:
 
 deploy:
     stage: deploy
-    script: ./gradlew buildPlugin
+    script: chmod +x ./gradlew && ./gradlew buildPlugin
     cache:
         key: "$CI_COMMIT_REF_NAME"
         policy: pull
