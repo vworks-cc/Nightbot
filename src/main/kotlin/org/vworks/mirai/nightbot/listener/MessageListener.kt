@@ -52,10 +52,12 @@ class MessageListener(val pluginBase : KotlinPlugin) : ListenerHost {
                     RegimenData.lastEvent[sender.id] == RegimeEvent.WAKE -> {
                         val duration =
                             (Clock.System.now().epochSeconds - RegimenData.lastAwakeTime[sender.id]!!.epochSeconds).seconds
-                        val doubleWakeString = Config.doubleMorningPrompts
+                        val readableDuration =
+                            if(duration.toHours()>=24) "${duration.toDays()}天${duration.toHoursPart()}小时"
+                            else "${duration.toHoursPart()}小时${duration.toMinutesPart()}分"
+                        Config.doubleMorningPrompts
                             .filter { it2 -> duration.toHours() in it2.key }
-                            .flatMap { it2 -> it2.value }.randomOrNull()?:""
-                        doubleWakeString
+                            .flatMap { it2 -> it2.value }.randomOrNull()?.replace("\$hour", readableDuration) ?:""
                     }
                     RegimenData.lastSleepingTime.containsKey(sender.id) -> {
                         val sleptDuration =
@@ -93,9 +95,12 @@ class MessageListener(val pluginBase : KotlinPlugin) : ListenerHost {
                     RegimenData.lastEvent[sender.id] == RegimeEvent.SLEEP -> {
                         val duration =
                             (Clock.System.now().epochSeconds - RegimenData.lastSleepingTime[sender.id]!!.epochSeconds).seconds
+                        val readableDuration =
+                            if (duration.toHours() >= 24) "${duration.toDays()}天${duration.toHoursPart()}小时"
+                            else "${duration.toHoursPart()}小时${duration.toMinutesPart()}分"
                         Config.doubleNightPrompts
                             .filter { it2 -> duration.toInt(DurationUnit.HOURS) in it2.key }
-                            .flatMap { it2 -> it2.value }.randomOrNull() ?: ""
+                            .flatMap { it2 -> it2.value }.randomOrNull()?.replace("\$hour", readableDuration) ?: ""
                     }
                     RegimenData.lastAwakeTime.containsKey(sender.id) -> {
                         val awakeDuration =

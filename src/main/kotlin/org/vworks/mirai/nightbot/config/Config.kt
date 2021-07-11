@@ -26,9 +26,9 @@ object Config : AutoSavePluginConfig("config") {
     val nightPromptsByDuration : Map<SerializableIntRange, List<String>>
         by value(mapOf(SerializableIntRange(0, 24) to listOf("今天你清醒了\$hour")))
     val doubleMorningPrompts : Map<SerializableIntRange, List<String>>
-        by value(mapOf(SerializableIntRange(0, 24) to listOf("你搁这儿仰卧起坐呢？")))
+        by value(mapOf(SerializableIntRange(0, 24) to listOf("离你上次起床过去了\$hour。你搁这儿仰卧起坐呢？")))
     val doubleNightPrompts : Map<SerializableIntRange, List<String>>
-        by value(mapOf(SerializableIntRange(0, 24) to listOf("你是在梦里又睡了一觉吗？")))
+        by value(mapOf(SerializableIntRange(0, 24) to listOf("离你上次睡觉过去了\$hour。你是在梦里又睡了一觉吗？")))
 
     @Transient var initialized = false
     @Transient var morningRegExCompiled = morningRegEx.map{Regex(it)}
