@@ -9,12 +9,12 @@
 
 ## 配置文件范例
 ```yaml
-doNotUseAllBots: false
-useBotList: []
-useWhiteList: false
-useBlackList: false
-whiteList: []
-blackList: []
+doNotUseAllBots: false #是否对所有BOT账号启用该插件
+useBotList: [] #启用插件的BOT账号
+useWhiteList: false #白名单
+useBlackList: false #黑名单
+whiteList: [] #启用BOT功能的群聊群号
+blackList: [] #不启用BOT功能的群聊群号
 morningRegEx: 
   - '^早$'
   - 早上好
