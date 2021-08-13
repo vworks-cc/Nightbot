@@ -15,6 +15,8 @@ import org.vworks.mirai.nightbot.data.RegimeEvent
 import org.vworks.mirai.nightbot.data.RegimenData
 import kotlinx.datetime.LocalDateTime
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
+import net.mamoe.mirai.contact.Member
+import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.content
 import kotlin.time.Duration
 import java.util.*
@@ -22,18 +24,24 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
-class MessageListener(val pluginBase : KotlinPlugin) : ListenerHost {
-    fun botsList(): List<Bot>
-        = if(Config.doNotUseAllBots) Bot.instances.filter { it.id in Config.useBotList } else Bot.instances
-
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+class MessageListener(val pluginBase: KotlinPlugin) : ListenerHost {
 
     @ExperimentalTime
     @EventHandler
     suspend fun MessageEvent.onMessage() {
-        if(Config.doNotUseAllBots && bot.id !in Config.useBotList) { return }
-        if(Config.useWhiteList && sender.id !in Config.whiteList) { return }
-        if(Config.useBlackList && sender.id in Config.blackList) { return }
+        if (Config.doNotUseAllBots && bot.id !in Config.useBotList) {
+            return
+        }
+        if (Config.useWhiteList && sender.id !in Config.whiteList &&
+            if (sender is Member) (sender as Member).group.id !in Config.whiteList else true
+        ) {
+            return
+        }
+        if (Config.useBlackList && (sender.id in Config.blackList) ||
+            if (sender is Member) ((sender as Member).group.id) in Config.blackList else false
+        ) {
+            return
+        }
 
         matchMorning()
         matchNight()
@@ -43,30 +51,30 @@ class MessageListener(val pluginBase : KotlinPlugin) : ListenerHost {
     private suspend fun MessageEvent.matchMorning() {
         Config.checkLoad()
         Config.morningRegExCompiled.forEach {
-            if(it.containsMatchIn(message.contentToString())) {
+            if (it.containsMatchIn(message.contentToString())) {
                 val randTimeGreeting = Config.morningPromptsByHour
                     .filter { it2 -> Calendar.getInstance().get(Calendar.HOUR_OF_DAY) in it2.key }
-                    .flatMap { it2 -> it2.value }.randomOrNull()?:""
+                    .flatMap { it2 -> it2.value }.randomOrNull() ?: ""
 
                 val combinedDurationString = when {
                     RegimenData.lastEvent[sender.id] == RegimeEvent.WAKE -> {
                         val duration =
-                            (Clock.System.now().epochSeconds - RegimenData.lastAwakeTime[sender.id]!!.epochSeconds).seconds
+                            Duration.seconds((Clock.System.now().epochSeconds - RegimenData.lastAwakeTime[sender.id]!!.epochSeconds))
                         val readableDuration =
-                            if(duration.toHours()>=24) "${duration.toDays()}天${duration.toHoursPart()}小时"
+                            if (duration.toHours() >= 24) "${duration.toDays()}天${duration.toHoursPart()}小时"
                             else "${duration.toHoursPart()}小时${duration.toMinutesPart()}分"
                         Config.doubleMorningPrompts
                             .filter { it2 -> duration.toHours() in it2.key }
-                            .flatMap { it2 -> it2.value }.randomOrNull()?.replace("\$hour", readableDuration) ?:""
+                            .flatMap { it2 -> it2.value }.randomOrNull()?.replace("\$hour", readableDuration) ?: ""
                     }
                     RegimenData.lastSleepingTime.containsKey(sender.id) -> {
                         val sleptDuration =
-                            (Clock.System.now().epochSeconds - RegimenData.lastSleepingTime[sender.id]!!.epochSeconds).seconds
+                            Duration.seconds((Clock.System.now().epochSeconds - RegimenData.lastSleepingTime[sender.id]!!.epochSeconds))
                         val randDurationGreeting = Config.morningPromptsByDuration
                             .filter { it2 -> sleptDuration.toHours() in it2.key }
-                            .flatMap { it2 -> it2.value }.randomOrNull()?:""
+                            .flatMap { it2 -> it2.value }.randomOrNull() ?: ""
                         val readableDuration =
-                            if(sleptDuration.toHours()>=24) "${sleptDuration.toDays()}天${sleptDuration.toHoursPart()}小时"
+                            if (sleptDuration.toHours() >= 24) "${sleptDuration.toDays()}天${sleptDuration.toHoursPart()}小时"
                             else "${sleptDuration.toHoursPart()}小时${sleptDuration.toMinutesPart()}分"
                         randDurationGreeting.replace("\$hour", readableDuration)
                     }
@@ -94,7 +102,7 @@ class MessageListener(val pluginBase : KotlinPlugin) : ListenerHost {
                 val combinedDurationString = when {
                     RegimenData.lastEvent[sender.id] == RegimeEvent.SLEEP -> {
                         val duration =
-                            (Clock.System.now().epochSeconds - RegimenData.lastSleepingTime[sender.id]!!.epochSeconds).seconds
+                            Duration.seconds((Clock.System.now().epochSeconds - RegimenData.lastSleepingTime[sender.id]!!.epochSeconds))
                         val readableDuration =
                             if (duration.toHours() >= 24) "${duration.toDays()}天${duration.toHoursPart()}小时"
                             else "${duration.toHoursPart()}小时${duration.toMinutesPart()}分"
@@ -104,7 +112,7 @@ class MessageListener(val pluginBase : KotlinPlugin) : ListenerHost {
                     }
                     RegimenData.lastAwakeTime.containsKey(sender.id) -> {
                         val awakeDuration =
-                            (Clock.System.now().epochSeconds - RegimenData.lastAwakeTime[sender.id]!!.epochSeconds).seconds
+                            Duration.seconds((Clock.System.now().epochSeconds - RegimenData.lastAwakeTime[sender.id]!!.epochSeconds))
                         val randDurationGreeting = Config.nightPromptsByDuration
                             .filter { it2 -> awakeDuration.toHours() in it2.key }
                             .flatMap { it2 -> it2.value }.randomOrNull() ?: ""
