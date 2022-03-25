@@ -8,8 +8,8 @@ import kotlinx.serialization.descriptors.SerialKind
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
+@ExperimentalSerializationApi
 class SerializerIntRange() : KSerializer<SerializableIntRange> {
-    @ExperimentalSerializationApi
     override val descriptor: SerialDescriptor = object : SerialDescriptor {
         val names = listOf("start", "endInclusive")
         val indicies = mapOf("start" to 0, "endInclusive" to 1)
