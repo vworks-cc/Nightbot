@@ -1,18 +1,18 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.6.10"
-    val miraiVersion = "2.10.1"
+    val kotlinVersion = "1.7.0"
+    val miraiVersion = "2.12.1"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
     id("net.mamoe.mirai-console") version miraiVersion
 }
 
 group = "org.vworks.mirai"
-version = "1.1"
+version = "1.1.1"
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
     implementation(kotlin("stdlib-jdk8"))
 }
 

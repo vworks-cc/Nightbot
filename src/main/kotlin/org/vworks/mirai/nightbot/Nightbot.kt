@@ -17,10 +17,10 @@ object Nightbot : KotlinPlugin(
     JvmPluginDescription(
         id = "org.vworks.mirai.nightbot",
         name = "Nightbot - Mirai",
-        version = "1.0-SNAPSHOT",
+        version = "1.1.1",
     ) {
         author("MetricVoid")
-        info("""Nightbot的Mirai原生版本""")
+        info("""早安晚安bot""")
     }
 ) {
     override fun onEnable() {
